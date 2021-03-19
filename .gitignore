@@ -1,0 +1,6 @@
+.idea
+.vscode
+.env
+
+./configs/*
+!./configs/example.yaml
