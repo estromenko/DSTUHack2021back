@@ -12,6 +12,8 @@ import (
 type Database struct {
 	logger *zerolog.Logger
 	db     *sql.DB
+
+	userRepo *UserRepo
 }
 
 func NewDatabase(logger *zerolog.Logger) *Database {
@@ -64,4 +66,11 @@ func (d *Database) Migrate(migrationsPath string) error {
 	}
 	d.logger.Info().Msg("Migrated successfully.")
 	return nil
+}
+
+func (d *Database) User() *UserRepo {
+	if d.userRepo == nil {
+		d.userRepo = NewUserRepo(d.db)
+	}
+	return d.userRepo
 }

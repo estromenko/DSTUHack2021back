@@ -56,7 +56,9 @@ func (a *app) Run() error {
 	}
 	defer a.db.Close()
 
-	a.db.Migrate(viper.GetString("migrationsPath"))
+	if err := a.db.Migrate(viper.GetString("migrationsPath")); err != nil {
+		return err
+	}
 
 	a.logger.Info().Msg("Server started at port " + viper.GetString("port"))
 	return a.server.Run()
