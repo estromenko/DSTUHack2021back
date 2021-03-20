@@ -21,21 +21,37 @@ type APIService struct {
 	client    *http.Client
 }
 
-func (s *APIService) GetAllSymbolStocks() ([]*Stock, error) {
-	req, err := http.NewRequest("GET", s.location+"?access_key="+s.accessKey, nil)
+type resStocks struct {
+	Data []*Stock `json:"data"`
+}
+
+func NewAPIService(accessKey string) *APIService {
+	return &APIService{
+		location:  "https://api.marketstack.com/v1",
+		accessKey: accessKey,
+		client:    &http.Client{},
+	}
+}
+
+func (s *APIService) GetAllSymbolStocks(symbol string) ([]*Stock, error) {
+	path := s.location + "/eod?access_key=" + s.accessKey + "&symbols=" + symbol
+	req, err := http.NewRequest("GET", path, nil)
+
 	if err != nil {
 		return nil, err
 	}
 
-	var stocks []*Stock
+	var stocks resStocks
 
 	res, err := s.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
+
 	if err := json.NewDecoder(res.Body).Decode(&stocks); err != nil {
 		return nil, err
 	}
-	return stocks, nil
+
+	return stocks.Data, nil
 }

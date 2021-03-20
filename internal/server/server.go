@@ -16,6 +16,7 @@ type Server struct {
 	db     *db.Database
 
 	userService *services.UserService
+	apiService  *services.APIService
 }
 
 func NewServer(db *db.Database, logger *zerolog.Logger) *Server {
@@ -40,6 +41,9 @@ func (s *Server) Run() error {
 	user := router.PathPrefix("/user").Subrouter()
 	user.HandleFunc("/info", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserInfo()))).Methods("GET")
 
+	api := router.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/tickers", s.baseMiddleware(s.GetAllSymbolStocks())).Methods("GET")
+
 	return http.ListenAndServe(":"+viper.GetString("port"), router)
 }
 
@@ -48,4 +52,11 @@ func (s *Server) User() *services.UserService {
 		s.userService = services.NewUserService(s.db)
 	}
 	return s.userService
+}
+
+func (s *Server) API() *services.APIService {
+	if s.apiService == nil {
+		s.apiService = services.NewAPIService(viper.GetString("api_access_key"))
+	}
+	return s.apiService
 }
