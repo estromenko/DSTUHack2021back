@@ -46,8 +46,12 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 			amount        int
 		)
 
+<<<<<<< HEAD
 		if err := rows.Scan(
 			&id,
+=======
+		if err := rows.Scan(&id,
+>>>>>>> main
 			&userId,
 			&_type,
 			&name,
@@ -69,6 +73,7 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 	}
 	return operations, nil
 }
+<<<<<<< HEAD
  
 // Ищем все операции одного типа
 func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]*models.Operation, error) {
@@ -76,6 +81,15 @@ func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]
 
 	var operations []*models.Operation 
 	for rows.Next()	{
+=======
+
+// Валюта, акция, облигация
+func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.Operation, error) {
+	rows, _ := u.db.Query(`SELECET * FROM operations WHERE type = $1 AND user_id = $2`, searchType, id)
+
+	var operations []*models.Operation
+	for rows.Next() {
+>>>>>>> main
 		var (
 			id            int
 			userId        int
@@ -85,8 +99,12 @@ func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]
 			amount        int
 		)
 
+<<<<<<< HEAD
 		if err := rows.Scan(
 			&id,
+=======
+		if err := rows.Scan(&id,
+>>>>>>> main
 			&userId,
 			&_type,
 			&name,
@@ -95,7 +113,11 @@ func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]
 		); err != nil {
 			return nil, err
 		}
+<<<<<<< HEAD
 		_operation := &models.Operation{
+=======
+		operation := &models.Operation{
+>>>>>>> main
 			ID:            id,
 			UserId:        userId,
 			Type:          _type,
@@ -104,6 +126,7 @@ func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]
 			Amount:        amount,
 		}
 
+<<<<<<< HEAD
 		operations = append(operations, _operation)
 	}
 	return operations, nil
@@ -145,4 +168,10 @@ func (u *OperationRepo) DeleteOperationById(id int) error{
 	}
 
 	return nil
+=======
+		operations = append(operations, operation)
+	}
+
+	return operations, nil
+>>>>>>> main
 }

@@ -9,3 +9,5 @@ migrationsPath: "migrations"
 salt: "asdasdasdas"
 
 jwt_secret: "asdasdasdsa"
+
+api_access_key: "asdasdasdas"

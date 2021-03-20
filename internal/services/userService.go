@@ -126,4 +126,3 @@ func (u *UserService) GenerateToken(user *models.User) (string, error) {
 
 	return token.SignedString([]byte(viper.GetString("jwt_secret")))
 }
-	
