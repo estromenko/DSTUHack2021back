@@ -7,6 +7,14 @@ Endpoints:
 `/auth/login` (POST): [email, password]
 => (id, token, name)
 
+
+`/user/info` (GET) 
+=> (id, email, first_name, last_name)
+
+`/user/operations` (GET) 
+=> array of (id, name, price, quantity, type, user_id)
+
+
 `/api/operation` (POST): [type, ticker, price, quantity]
 => (balance)
 
