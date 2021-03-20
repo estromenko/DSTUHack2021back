@@ -14,6 +14,9 @@ Endpoints:
 `/user/operations` (GET) 
 => array of (id, name, price, quantity, type, user_id)
 
+`/user/portfolio` (GET)
+=> map with symbols as keys and quantity as values
+
 
 `/api/operation` (POST): [type, ticker, price, quantity]
 => (balance)
