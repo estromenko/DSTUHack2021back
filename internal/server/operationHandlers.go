@@ -25,12 +25,14 @@ func (s *Server) GetAllOperationsByUserId() http.HandlerFunc {
 	}
 }
 
-func (s* Server) GetAllOperationsByUserIdAndType() http.HandlerFunc {
+func (s* Server) GetAllOperationsByUserIdAndName() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value("user")
 
+
+
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"asdasd" : "sad"
+			"0" : "2212",
 		})
 	}
 }

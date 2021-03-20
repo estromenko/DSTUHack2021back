@@ -69,13 +69,13 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 	}
 	return operations, nil
 }
+ 
+// Ищем все операции одного типа
+func (u *OperationRepo) GetOperationByNameAndUserId(name string, userId int) ([]*models.Operation, error) {
+	rows, _ := u.db.Query(`SELECT * FROM operations WHERE user_id = $1 AND name = $2`, userId, name)
 
-// Валюта, акция, облигация
-func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.Operation, error) {
-	rows, _ := u.db.Query(`SELECET * FROM operations WHERE type = $1 AND userId = $2`, searchType, id)
-
-	var opertaions []*models.Operation
-	for rows.Next() {
+	var operations []*models.Operation 
+	for rows.Next()	{
 		var (
 			id            int
 			userId        int
@@ -85,7 +85,8 @@ func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.O
 			amount        int
 		)
 
-		if err := rows.Scan(&id,
+		if err := rows.Scan(
+			&id,
 			&userId,
 			&_type,
 			&name,
@@ -103,9 +104,9 @@ func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.O
 			Amount:        amount,
 		}
 
-		opertaions = append(opertaions, _operation)
+		operations = append(operations, _operation)
 	}
-	return opertaions, nil
+	return operations, nil
 }
 
 func (u *OperationRepo) ChangeOperation(operation *models.Operation, amount int) error {
