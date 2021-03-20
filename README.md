@@ -9,7 +9,7 @@ Endpoints:
 
 
 `/user/info` (GET) 
-=> (id, email, first_name, last_name)
+=> (id, email, first_name, last_name, balance)
 
 `/user/operations` (GET) 
 => array of (id, name, price, quantity, type, user_id)
