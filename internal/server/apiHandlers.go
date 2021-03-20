@@ -68,6 +68,14 @@ func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 		price, _ := req.Price.Float64()
 		quantity, _ := req.Quantity.Int64()
 
+		if price == 0 || quantity == 0 {
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "price and quantity must be provided",
+			})
+			return
+		}
+
 		if req.Type == "buy" {
 			if user.Balance < float32(price)*float32(int(quantity)) {
 				w.WriteHeader(400)
@@ -78,6 +86,33 @@ func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 			}
 
 		} else {
+			portfolio, err := s.User().GetPortfolio(user.ID)
+			if err != nil {
+				w.WriteHeader(400)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error":   err.Error(),
+					"message": "error getting portfolio",
+				})
+				return
+			}
+
+			val, ok := portfolio[req.Ticker]
+			if !ok {
+				w.WriteHeader(400)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error": "user does not have and stocks of this type",
+				})
+				return
+			}
+
+			if quantity > int64(val) {
+				w.WriteHeader(400)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error": "not enough stocks to sell",
+				})
+				return
+			}
+
 			price *= -1
 		}
 
@@ -86,15 +121,16 @@ func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 		s.User().Repo().Update(user)
 
 		if err := s.db.Operation().Create(&models.Operation{
-			UserId: user.ID,
-			Type:   req.Type,
-			Name:   req.Ticker,
-			Price:  float32(price),
+			UserId:   user.ID,
+			Type:     req.Type,
+			Symbol:   req.Ticker,
+			Price:    float32(price),
 			Quantity: int(quantity),
 		}); err != nil {
 			w.WriteHeader(400)
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"error": err.Error(),
+				"error":   err.Error(),
+				"message": "error creating new operation",
 			})
 			return
 		}

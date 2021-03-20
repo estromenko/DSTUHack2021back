@@ -41,6 +41,7 @@ func (s *Server) Run() error {
 	user := router.PathPrefix("/user").Subrouter()
 	user.HandleFunc("/info", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserInfo()))).Methods("GET")
 	user.HandleFunc("/operations", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllUserOperations()))).Methods("GET")
+	user.HandleFunc("/portfolio", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserPortfolio()))).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/tickers", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllTickers()))).Methods("GET")

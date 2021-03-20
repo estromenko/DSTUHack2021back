@@ -126,3 +126,26 @@ func (u *UserService) GenerateToken(user *models.User) (string, error) {
 
 	return token.SignedString([]byte(viper.GetString("jwt_secret")))
 }
+
+func (u *UserService) GetPortfolio(userID int) (map[string]int, error) {
+	operations, err := u.db.Operation().GetAllByUserId(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	processedOperation := make(map[string]int)
+
+	for _, v := range operations {
+		if _, ok := processedOperation[v.Symbol]; !ok {
+			processedOperation[v.Symbol] = 0
+		}
+
+		if v.Type == "buy" {
+			processedOperation[v.Symbol] += v.Quantity
+		} else {
+			processedOperation[v.Symbol] -= v.Quantity
+		}
+	}
+
+	return processedOperation, nil
+}

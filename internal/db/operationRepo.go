@@ -19,21 +19,21 @@ func NewOperationRepo(db *sql.DB) *OperationRepo {
 
 // Create operation
 func (u *OperationRepo) Create(operation *models.Operation) error {
-	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, name, price, amount) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, symbol, price, quantity) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		&operation.UserId,
 		&operation.Type,
-		&operation.Name,
+		&operation.Symbol,
 		&operation.Price,
 		&operation.Quantity,
-	).Scan(&operation.UserId); err != nil {
+	).Scan(&operation.ID); err != nil {
 		return err
 	}
 	return nil
 }
 
 // GetAllByUserId ...
-func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) {
-	rows, _ := u.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
+func (r *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) {
+	rows, _ := r.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
 
 	var operations []*models.Operation
 	for rows.Next() {
@@ -59,7 +59,7 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 			ID:       id,
 			UserId:   userId,
 			Type:     _type,
-			Name:     name,
+			Symbol:   name,
 			Price:    Price,
 			Quantity: amount,
 		}
