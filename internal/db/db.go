@@ -14,6 +14,7 @@ type Database struct {
 	db     *sql.DB
 
 	userRepo *UserRepo
+	operationRepo *OperationRepo
 }
 
 func NewDatabase(logger *zerolog.Logger) *Database {
@@ -67,7 +68,16 @@ func (d *Database) Migrate(migrationsPath string) error {
 	d.logger.Info().Msg("Migrated successfully.")
 	return nil
 }
+ 
+// Создаем экземпляр операции
+func (d *Database) OpretaionRepoCreate() *OperationRepo {
+	if d.operationRepo == nil {
+		d.operationRepo = NewOperationRepo(d.db)
+	}
+	return d.operationRepo
+}
 
+// Создаем экземпляр пользователь
 func (d *Database) User() *UserRepo {
 	if d.userRepo == nil {
 		d.userRepo = NewUserRepo(d.db)
