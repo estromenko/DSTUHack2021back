@@ -5,19 +5,16 @@ import (
 	"dstuhack/internal/models"
 )
 
-// UserRepo ...
 type UserRepo struct {
 	db *sql.DB
 }
 
-// NewUserRepo ...
 func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{
 		db: db,
 	}
 }
 
-// FindByID ...
 func (u *UserRepo) FindByID(id int) (*models.User, error) {
 	var user models.User
 
@@ -35,7 +32,6 @@ func (u *UserRepo) FindByID(id int) (*models.User, error) {
 	return &user, nil
 }
 
-// FindByEmail ...
 func (u *UserRepo) FindByEmail(email string) (*models.User, error) {
 	var user models.User
 
@@ -53,7 +49,6 @@ func (u *UserRepo) FindByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-// Create ...
 func (u *UserRepo) Create(user *models.User) error {
 	if _, err := u.FindByEmail(user.Email); err != nil && err != sql.ErrNoRows {
 		return err
@@ -64,4 +59,17 @@ func (u *UserRepo) Create(user *models.User) error {
 		&user.LastName,
 		&user.Password,
 	).Scan(&user.ID)
+}
+
+func (u *UserRepo) Update(user *models.User) error {
+	if _, err := u.FindByEmail(user.Email); err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	return u.db.QueryRow(`UPDATE users SET first_name = $1, last_name = $2, password = $3, balance = $4`,
+		&user.FirstName,
+		&user.LastName,
+		&user.Password,
+		&user.Balance,
+	).Scan()
 }
