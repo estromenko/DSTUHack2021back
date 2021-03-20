@@ -31,8 +31,9 @@ func (s *Server) GetAllSymbolStocks() http.HandlerFunc {
 	}
 }
 
-func (s *Server) BuyStoke() http.HandlerFunc {
+func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 	type request struct {
+		Type     string      `json:"type"`
 		Ticker   string      `json:"ticker"`
 		Price    json.Number `json:"price,omitempty"`
 		Quantity json.Number `json:"quantity"`
@@ -56,15 +57,28 @@ func (s *Server) BuyStoke() http.HandlerFunc {
 			return
 		}
 
+		if req.Type != "buy" && req.Type != "sell" {
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": "invalid operation",
+			})
+			return
+		}
+
 		price, _ := req.Price.Float64()
 		quantity, _ := req.Quantity.Int64()
 
-		if user.Balance < float32(price)*float32(int(quantity)) {
-			w.WriteHeader(400)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"error": "not enough money",
-			})
-			return
+		if req.Type == "buy" {
+			if user.Balance < float32(price)*float32(int(quantity)) {
+				w.WriteHeader(400)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error": "not enough money",
+				})
+				return
+			}
+
+		} else {
+			price *= -1
 		}
 
 		user.Balance -= float32(price) * float32(int(quantity))
@@ -72,11 +86,11 @@ func (s *Server) BuyStoke() http.HandlerFunc {
 		s.User().Repo().Update(user)
 
 		if err := s.db.Operation().Create(&models.Operation{
-			UserId:        user.ID,
-			Type:          "stock",
-			Name:          req.Ticker,
-			PurchasePrice: float32(price),
-			Amount:        int(quantity),
+			UserId: user.ID,
+			Type:   req.Type,
+			Name:   req.Ticker,
+			Price:  float32(price),
+			Quantity: int(quantity),
 		}); err != nil {
 			w.WriteHeader(400)
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -87,8 +101,25 @@ func (s *Server) BuyStoke() http.HandlerFunc {
 
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": "stock successfully bought",
+			"success": "operation done successfully",
+			"balance": user.Balance,
 		})
 		return
+	}
+}
+
+func (s *Server) GetAllTickers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tickers, err := s.API().GetAllTickers()
+		if err != nil {
+			w.WriteHeader(400)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(tickers)
 	}
 }

@@ -42,8 +42,9 @@ func (s *Server) Run() error {
 	user.HandleFunc("/info", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserInfo()))).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/tickers", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllSymbolStocks()))).Methods("GET")
-	api.HandleFunc("/buy", s.baseMiddleware(s.AuthenticationMiddleware(s.BuyStoke()))).Methods("POST")
+	api.HandleFunc("/tickers", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllTickers()))).Methods("GET")
+	api.HandleFunc("/tickers/stocks", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllSymbolStocks()))).Methods("GET")
+	api.HandleFunc("/operation", s.baseMiddleware(s.AuthenticationMiddleware(s.BuyOrSellStoke()))).Methods("POST")
 
 	return http.ListenAndServe(":"+viper.GetString("port"), router)
 }

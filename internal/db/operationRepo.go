@@ -19,12 +19,12 @@ func NewOperationRepo(db *sql.DB) *OperationRepo {
 
 // Create operation
 func (u *OperationRepo) Create(operation *models.Operation) error {
-	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, name, purchase_price, amount) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, name, price, amount) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		&operation.UserId,
 		&operation.Type,
 		&operation.Name,
-		&operation.PurchasePrice,
-		&operation.Amount,
+		&operation.Price,
+		&operation.Quantity,
 	).Scan(&operation.UserId); err != nil {
 		return err
 	}
@@ -38,30 +38,30 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 	var operations []*models.Operation
 	for rows.Next() {
 		var (
-			id            int
-			userId        int
-			_type         string
-			name          string
-			purchasePrice float32
-			amount        int
+			id     int
+			userId int
+			_type  string
+			name   string
+			Price  float32
+			amount int
 		)
 
 		if err := rows.Scan(&id,
 			&userId,
 			&_type,
 			&name,
-			&purchasePrice,
+			&Price,
 			&amount,
 		); err != nil {
 			return nil, err
 		}
 		_operation := &models.Operation{
-			ID:            id,
-			UserId:        userId,
-			Type:          _type,
-			Name:          name,
-			PurchasePrice: purchasePrice,
-			Amount:        amount,
+			ID:     id,
+			UserId: userId,
+			Type:   _type,
+			Name:   name,
+			Price:  Price,
+			Quantity: amount,
 		}
 
 		operations = append(operations, _operation)
@@ -76,30 +76,30 @@ func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.O
 	var operations []*models.Operation
 	for rows.Next() {
 		var (
-			id            int
-			userId        int
-			_type         string
-			name          string
-			purchasePrice float32
-			amount        int
+			id     int
+			userId int
+			_type  string
+			name   string
+			Price  float32
+			amount int
 		)
 
 		if err := rows.Scan(&id,
 			&userId,
 			&_type,
 			&name,
-			&purchasePrice,
+			&Price,
 			&amount,
 		); err != nil {
 			return nil, err
 		}
 		operation := &models.Operation{
-			ID:            id,
-			UserId:        userId,
-			Type:          _type,
-			Name:          name,
-			PurchasePrice: purchasePrice,
-			Amount:        amount,
+			ID:     id,
+			UserId: userId,
+			Type:   _type,
+			Name:   name,
+			Price:  Price,
+			Quantity: amount,
 		}
 
 		operations = append(operations, operation)

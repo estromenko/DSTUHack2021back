@@ -15,14 +15,23 @@ type Stock struct {
 	Symbol string  `json:"symbol"`
 }
 
+type Ticker struct {
+	Name   string `json:"name"`
+	Symbol string `json:"symbol"`
+}
+
 type APIService struct {
 	location  string
 	accessKey string
 	client    *http.Client
 }
 
-type resStocks struct {
+type StockResponse struct {
 	Data []*Stock `json:"data"`
+}
+
+type TickerResponse struct {
+	Data []*Ticker `json:"data"`
 }
 
 func NewAPIService(accessKey string) *APIService {
@@ -41,7 +50,7 @@ func (s *APIService) GetAllSymbolStocks(symbol string) ([]*Stock, error) {
 		return nil, err
 	}
 
-	var stocks resStocks
+	var stocks StockResponse
 
 	res, err := s.client.Do(req)
 	if err != nil {
@@ -54,4 +63,27 @@ func (s *APIService) GetAllSymbolStocks(symbol string) ([]*Stock, error) {
 	}
 
 	return stocks.Data, nil
+}
+
+func (s *APIService) GetAllTickers() ([]*Ticker, error) {
+	path := s.location + "/tickers?access_key=" + s.accessKey
+	req, err := http.NewRequest("GET", path, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var tickers TickerResponse
+
+	res, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&tickers); err != nil {
+		return nil, err
+	}
+
+	return tickers.Data, nil
 }
