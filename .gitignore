@@ -2,5 +2,5 @@
 .vscode
 .env
 
-./configs/*
+./configs/dev.yaml
 !./configs/example.yaml
