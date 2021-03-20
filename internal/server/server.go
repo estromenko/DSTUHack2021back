@@ -3,6 +3,7 @@ package server
 import (
 	"dstuhack/internal/db"
 	"dstuhack/internal/services"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,9 +27,18 @@ func NewServer(db *db.Database, logger *zerolog.Logger) *Server {
 
 func (s *Server) Run() error {
 	router := mux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok": "ok",
+		})
+	})
 
 	auth := router.PathPrefix("/auth").Subrouter()
 	auth.HandleFunc("/reg", s.baseMiddleware(s.RegisterUser())).Methods("POST")
+	auth.HandleFunc("/login", s.baseMiddleware(s.LoginUser())).Methods("POST")
+
+	user := router.PathPrefix("/user").Subrouter()
+	user.HandleFunc("/info", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserInfo()))).Methods("GET")
 
 	return http.ListenAndServe(":"+viper.GetString("port"), router)
 }
