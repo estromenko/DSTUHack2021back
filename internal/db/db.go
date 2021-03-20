@@ -13,7 +13,8 @@ type Database struct {
 	logger *zerolog.Logger
 	db     *sql.DB
 
-	userRepo *UserRepo
+	userRepo      *UserRepo
+	operationRepo *OperationRepo
 }
 
 func NewDatabase(logger *zerolog.Logger) *Database {
@@ -73,4 +74,11 @@ func (d *Database) User() *UserRepo {
 		d.userRepo = NewUserRepo(d.db)
 	}
 	return d.userRepo
+}
+
+func (d *Database) Operation() *OperationRepo {
+	if d.operationRepo == nil {
+		d.operationRepo = NewOperationRepo(d.db)
+	}
+	return d.operationRepo
 }

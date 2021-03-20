@@ -32,6 +32,8 @@ func (s *Server) RegisterUser() http.HandlerFunc {
 		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"token": token,
+			"id":    user.ID,
+			"name":  user.FirstName + " " + user.LastName,
 		})
 	}
 }
@@ -76,9 +78,11 @@ func (s *Server) LoginUser() http.HandlerFunc {
 			})
 			return
 		}
-		w.WriteHeader(400)
+		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"token": token,
+			"id":    user.ID,
+			"name":  user.FirstName + " " + user.LastName,
 		})
 	}
 }
