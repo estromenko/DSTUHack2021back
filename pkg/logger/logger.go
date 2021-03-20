@@ -11,7 +11,9 @@ func CreateLogger(levelString string) (*zerolog.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	logger := zerolog.New(os.Stdout)
 	logger.Level(level)
+
 	return &logger, nil
 }

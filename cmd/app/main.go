@@ -2,6 +2,7 @@ package main
 
 import (
 	"dstuhack/internal/app"
+	"log"
 
 	"flag"
 )
@@ -19,5 +20,5 @@ func main() {
 
 	application := app.NewApplication()
 	application.ReadConfig(configPath)
-	application.Run()
+	log.Fatal(application.Run())
 }

@@ -39,6 +39,9 @@ func (s *Server) Run() error {
 	auth.HandleFunc("/login", s.baseMiddleware(s.LoginUser())).Methods("POST")
 
 	user := router.PathPrefix("/user").Subrouter()
+
+	user.HandleFunc("/balance", s.baseMiddleware(s.AuthenticationMiddleware(s.UpdateUserBalance()))).Methods("PUT")
+
 	user.HandleFunc("/info", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserInfo()))).Methods("GET")
 	user.HandleFunc("/operations", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllUserOperations()))).Methods("GET")
 	user.HandleFunc("/portfolio", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserPortfolio()))).Methods("GET")
