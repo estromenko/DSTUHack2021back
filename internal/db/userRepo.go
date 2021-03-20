@@ -21,7 +21,7 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 func (u *UserRepo) FindByID(id int) (*models.User, error) {
 	var user models.User
 
-	if err := u.db.QueryRow(`SELECT * FROM users WHERE id = $1`, id).Scan(
+	if err := u.db.QueryRow(`SELECT * FROM users git `, id).Scan(
 		&user.ID,
 		&user.Email,
 		&user.FirstName,

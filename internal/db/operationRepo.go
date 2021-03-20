@@ -10,7 +10,7 @@ type OperationRepo struct {
 	db *sql.DB
 }
 
-// New opertaion 
+// New opertaion
 func NewOperationRepo(db *sql.DB) *OperationRepo {
 	return &OperationRepo{
 		db: db,
@@ -33,35 +33,36 @@ func (u *OperationRepo) Create(operation *models.Operation) error {
 
 // GetAllByUserId ...
 func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) {
-	rows, _:= u.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
+	rows, _ := u.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
 
 	var operations []*models.Operation
 	for rows.Next() {
 		var (
-			id       	  int
-			userId   	  int
-			_type	 	  string
-			name 	 	  string
+			id            int
+			userId        int
+			_type         string
+			name          string
 			purchasePrice float32
-			amount		  int
+			amount        int
 		)
 
-		if err := rows.Scan(&id, 
-			&userId, 
-			&_type, 
-			&name, 
-			&purchasePrice, 
+		if err := rows.Scan(
+			&id,
+			&userId,
+			&_type,
+			&name,
+			&purchasePrice,
 			&amount,
-			); err != nil {
+		); err != nil {
 			return nil, err
 		}
 		_operation := &models.Operation{
-			ID: id,
-			UserId: userId,
-			Type: _type,
-			Name: name,
-	 		PurchasePrice: purchasePrice,
-			Amount: amount,
+			ID:            id,
+			UserId:        userId,
+			Type:          _type,
+			Name:          name,
+			PurchasePrice: purchasePrice,
+			Amount:        amount,
 		}
 
 		operations = append(operations, _operation)
@@ -69,41 +70,78 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 	return operations, nil
 }
 
-
 // Валюта, акция, облигация
-func (u *OperationRepo) GetAllUserValute(searchType string, id int) []*models.Opertaion {
+func (u *OperationRepo) GetAllUserValute(searchType string, id int) ([]*models.Operation, error) {
 	rows, _ := u.db.Query(`SELECET * FROM operations WHERE type = $1 AND userId = $2`, searchType, id)
 
-	var opertaions []*models.Opertaion
+	var opertaions []*models.Operation
 	for rows.Next() {
 		var (
-			id       	  int
-			userId   	  int
-			_type	 	  string
-			name 	 	  string
+			id            int
+			userId        int
+			_type         string
+			name          string
 			purchasePrice float32
-			amount		  int
+			amount        int
 		)
 
-		if err := rows.Scan(&id, 
-			&userId, 
-			&_type, 
-			&name, 
-			&purchasePrice, 
+		if err := rows.Scan(&id,
+			&userId,
+			&_type,
+			&name,
+			&purchasePrice,
 			&amount,
-			); err != nil {
+		); err != nil {
 			return nil, err
 		}
 		_operation := &models.Operation{
-			ID: id,
-			UserId: userId,
-			Type: _type,
-			Name: name,
-	 		PurchasePrice: purchasePrice,
-			Amount: amount,
+			ID:            id,
+			UserId:        userId,
+			Type:          _type,
+			Name:          name,
+			PurchasePrice: purchasePrice,
+			Amount:        amount,
 		}
 
-		operations = append(operations, _operation)
+		opertaions = append(opertaions, _operation)
 	}
-	return operations, nil
+	return opertaions, nil
+}
+
+func (u *OperationRepo) ChangeOperation(operation *models.Operation, amount int) error {
+	var oldOperation models.Operation
+
+	if err := u.db.QueryRow(`SELECT * FROM operations WHERE type = $1 AND userId = $2 AND purchase_price = $3 AND amount = $4`,
+		operation.Type, operation.UserId, operation.PurchasePrice, operation.Amount).Scan(
+		&oldOperation.ID,
+		&oldOperation.UserId,
+		&oldOperation.Type,
+		&oldOperation.Name,
+		&oldOperation.PurchasePrice,
+		&oldOperation.Amount,
+	); err != nil {
+		return err
+	}
+	
+ 	var newAmount int = operation.Amount - amount
+
+	if err := u.db.QueryRow(`UPDATE operations SET amount = $1 WHERE type = $2 AND userId = $3 AND purchase_price = $4`, 
+		newAmount,
+		operation.UserId, 
+		operation.PurchasePrice, 
+		operation.Amount).Scan(); err != nil {
+		
+		return err
+	}
+	
+	return nil
+}
+
+func (u *OperationRepo) DeleteOperationById(id int) error{
+	if err := u.db.QueryRow(`DELETE FROM Salespeople WHERE id = $1`, 
+	id); err != nil {
+		return nil
+	}
+
+	return nil
 }
