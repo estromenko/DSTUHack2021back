@@ -58,7 +58,7 @@ func (u *UserRepo) Create(user *models.User) error {
 	if _, err := u.FindByEmail(user.Email); err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	return u.db.QueryRow(`INSERT INTO users (email, first_name, last_name, password, balance) VALUES ($1, $2, $3, 0) RETURNING id`,
+	return u.db.QueryRow(`INSERT INTO users (email, first_name, last_name, password, balance) VALUES ($1, $2, $3, $4, 0) RETURNING id`,
 		&user.Email,
 		&user.FirstName,
 		&user.LastName,
