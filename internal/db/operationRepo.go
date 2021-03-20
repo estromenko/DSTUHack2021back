@@ -18,21 +18,22 @@ func NewOperationRepo(db *sql.DB) *OperationRepo {
 }
 
 // Create operation
-func (u *OpertionRepo) Create(operation *models.Operation) error {
-	if _, err := u.db.QueryRow(`INSERT INTO operations (user_id, type, name, purchase_price, amount) VALUES ($1, $2, $3, $4, $5)`,
+func (u *OperationRepo) Create(operation *models.Operation) error {
+	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, name, purchase_price, amount) VALUES ($1, $2, $3, $4, $5)`,
 		&operation.UserId,
 		&operation.Type,
 		&operation.Name,
 		&operation.PurchasePrice,
 		&operation.Amount,
-	); if err != nil {
+	).Scan(&operation.UserId); err != nil {
 		return err
 	}
+	return nil
 }
 
 // GetAllByUserId ...
 func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) {
-	rows, err := u.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
+	rows, _:= u.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
 
 	var operations []*models.Operation
 	for rows.Next() {
@@ -46,23 +47,24 @@ func (u *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 		)
 
 		if err := rows.Scan(&id, 
-							&userId, 
-							&_type, 
-							&name, 
-							&purchasePrice, 
-							&amount); err != nil {
+			&userId, 
+			&_type, 
+			&name, 
+			&purchasePrice, 
+			&amount,
+			); err != nil {
 			return nil, err
 		}
 		_operation := &models.Operation{
-			ID: id
-			UserId: userId
-			Type: type_
-			Name: name
-	 		PurchasePrice: purchasePrice
-			Amount: amount
+			ID: id,
+			UserId: userId,
+			Type: _type,
+			Name: name,
+	 		PurchasePrice: purchasePrice,
+			Amount: amount,
 		}
 
-		operations = append(operations, _opertaion)
+		operations = append(operations, _operation)
 	}
-	return &operations, nil
+	return operations, nil
 }
