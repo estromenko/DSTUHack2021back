@@ -9,7 +9,7 @@ services:
     volumes: 
       - .:/workdir
 
-    command: go run cmd/app/main.go -config configs/dev.yaml
+    command: go run cmd/app/main.go -config configs/example.yaml
 
     depends_on: 
       - db

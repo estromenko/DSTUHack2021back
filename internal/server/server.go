@@ -29,9 +29,7 @@ func NewServer(db *db.Database, logger *zerolog.Logger) *Server {
 func (s *Server) Run() error {
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"ok": "ok",
-		})
+		json.NewEncoder(w).Encode("ok")
 	})
 
 	auth := router.PathPrefix("/auth").Subrouter()
@@ -47,6 +45,7 @@ func (s *Server) Run() error {
 	user.HandleFunc("/portfolio", s.baseMiddleware(s.AuthenticationMiddleware(s.GetUserPortfolio()))).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/stocks", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllStokes()))).Methods("GET")
 	api.HandleFunc("/tickers", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllTickers()))).Methods("GET")
 	api.HandleFunc("/tickers/stocks", s.baseMiddleware(s.AuthenticationMiddleware(s.GetAllSymbolStocks()))).Methods("GET")
 	api.HandleFunc("/operation", s.baseMiddleware(s.AuthenticationMiddleware(s.BuyOrSellStoke()))).Methods("POST")

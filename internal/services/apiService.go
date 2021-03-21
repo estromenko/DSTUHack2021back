@@ -6,13 +6,14 @@ import (
 )
 
 type Stock struct {
-	Open   float32 `json:"open"`
-	High   float32 `json:"high"`
-	Low    float32 `json:"low"`
-	Close  float32 `json:"close"`
-	Volume float32 `json:"volume"`
-	Date   string  `json:"date"`
-	Symbol string  `json:"symbol"`
+	Deference float32 `json:"deference"`
+	Open      float32 `json:"open"`
+	High      float32 `json:"high"`
+	Low       float32 `json:"low"`
+	Close     float32 `json:"close"`
+	Volume    float32 `json:"volume"`
+	Date      string  `json:"date"`
+	Symbol    string  `json:"symbol"`
 }
 
 type Ticker struct {
@@ -60,6 +61,10 @@ func (s *APIService) GetAllSymbolStocks(symbol string) ([]*Stock, error) {
 
 	if err := json.NewDecoder(res.Body).Decode(&stocks); err != nil {
 		return nil, err
+	}
+
+	for i := range stocks.Data {
+		stocks.Data[i].Deference = stocks.Data[i].Close - stocks.Data[i].Open
 	}
 
 	return stocks.Data, nil
