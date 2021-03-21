@@ -3,7 +3,6 @@ package server
 import (
 	"dstuhack/internal/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -200,8 +199,6 @@ func (s *Server) GetAllStokes() http.HandlerFunc {
 					Close:     vv.Close,
 					Diference: vv.Close - vv.Open,
 				}
-
-				fmt.Println(stock)
 
 				resp.Stocks = append(resp.Stocks, stock)
 			}

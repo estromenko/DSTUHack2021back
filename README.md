@@ -21,6 +21,9 @@ Endpoints:
 `/api/operation` (POST): [type, ticker, price, quantity]
 => (balance)
 
+`/api/stocks?page=...` (GET)
+=> (balance, array of [name, symbol, close, diference])
+
 `/api/tickers` (GET)
 => array of (name, symbol)
 
