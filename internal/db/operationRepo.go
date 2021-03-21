@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"dstuhack/internal/models"
+	"time"
 )
 
 // Operation repo
@@ -19,11 +20,13 @@ func NewOperationRepo(db *sql.DB) *OperationRepo {
 
 // Create operation
 func (u *OperationRepo) Create(operation *models.Operation) error {
-	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, symbol, price, quantity) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+	if err := u.db.QueryRow(`INSERT INTO operations (user_id, type, symbol, name, price, date, quantity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
 		&operation.UserId,
 		&operation.Type,
 		&operation.Symbol,
+		&operation.Name,
 		&operation.Price,
+		&operation.Date,
 		&operation.Quantity,
 	).Scan(&operation.ID); err != nil {
 		return err
@@ -32,26 +35,31 @@ func (u *OperationRepo) Create(operation *models.Operation) error {
 }
 
 // GetAllByUserId ...
-func (r *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) {
-	rows, _ := r.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userId)
+func (r *OperationRepo) GetAllByUserId(userID int) ([]*models.Operation, error) {
+	rows, _ := r.db.Query(`SELECT * FROM operations WHERE user_id = $1`, userID)
 
 	var operations []*models.Operation
 	for rows.Next() {
 		var (
-			id     int
-			userId int
-			_type  string
-			name   string
-			Price  float32
-			amount int
+			id       int
+			userId   int
+			_type    string
+			symbol   string
+			name     string
+			price    float32
+			date     time.Time
+			quantity int
 		)
 
-		if err := rows.Scan(&id,
+		if err := rows.Scan(
+			&id,
 			&userId,
 			&_type,
+			&symbol,
 			&name,
-			&Price,
-			&amount,
+			&price,
+			&date,
+			&quantity,
 		); err != nil {
 			return nil, err
 		}
@@ -59,9 +67,11 @@ func (r *OperationRepo) GetAllByUserId(userId int) ([]*models.Operation, error) 
 			ID:       id,
 			UserId:   userId,
 			Type:     _type,
-			Symbol:   name,
-			Price:    Price,
-			Quantity: amount,
+			Symbol:   symbol,
+			Name:     name,
+			Date:     date,
+			Price:    price,
+			Quantity: quantity,
 		}
 
 		operations = append(operations, _operation)

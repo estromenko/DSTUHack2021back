@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (s *Server) GetAllSymbolStocks() http.HandlerFunc {
@@ -36,6 +37,7 @@ func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 	type request struct {
 		Type     string      `json:"type"`
 		Ticker   string      `json:"ticker"`
+		Name     string      `json:"name"`
 		Price    json.Number `json:"price,omitempty"`
 		Quantity json.Number `json:"quantity"`
 	}
@@ -125,7 +127,9 @@ func (s *Server) BuyOrSellStoke() http.HandlerFunc {
 			UserId:   user.ID,
 			Type:     req.Type,
 			Symbol:   req.Ticker,
+			Name:     req.Name,
 			Price:    float32(price),
+			Date:     time.Now(),
 			Quantity: int(quantity),
 		}); err != nil {
 			w.WriteHeader(400)

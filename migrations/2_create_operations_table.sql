@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS operations (
     user_id int NOT NULL REFERENCES users (id),
     type VARCHAR(100) NOT NULL,
     symbol VARCHAR(100) NOT NULL,
+    name VARCHAR(100) DEFAULT '',
     price FLOAT(32) DEFAULT 0,
+    date TIMESTAMP NOT NULL DEFAULT NOW(),
     quantity int NOT NULL
 );
